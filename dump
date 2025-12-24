@@ -1,0 +1,466 @@
+Below are two ready-to-drop artifacts you can copy directly into a new repository:
+	1.	README.md – product vision, architecture, scope, and developer onboarding
+	2.	PLAN.md – phase-wise, execution-ready project plan with concrete milestones, responsibilities, and deliverables
+
+They are written assuming a small but serious team (2–5 engineers) and are explicit enough to start implementation immediately.
+
+⸻
+
+README.md
+
+# Local NotebookLM – Multimodal Knowledge Workspace (Gemini-powered)
+
+## Overview
+
+This project is a **local-first, Gemini-powered NotebookLM-style system** that allows knowledge workers to query, analyze, and synthesize insights across **heterogeneous data sources**:
+
+- Structured data (CSV, XLS, DuckDB tables) via **OLAP + Text-to-SQL**
+- Unstructured text (PDFs, DOCX, Markdown, plain text) via **advanced RAG**
+- Images via **OCR + Vision models**
+- Video via **ASR + timestamped transcript RAG**
+
+The system is designed as a **true agentic application**, not a single-shot LLM wrapper. It uses an explicit **ReAct-style agent loop** to:
+- Plan tool usage
+- Route queries across modalities
+- Execute, observe, repair, and synthesize answers
+- Provide citations and provenance
+
+This is intentionally scoped as a **developer-grade side project** that demonstrates modern AI engineering patterns end-to-end.
+
+---
+
+## Core Goals
+
+- Notebook-based workspace abstraction (like NotebookLM)
+- Local-first storage of user data
+- Explicit separation of:
+  - Structured analytics (OLAP)
+  - Unstructured retrieval (RAG)
+  - Multimodal understanding (image/video)
+- Clear, inspectable agent loop with tool calls
+- Incremental build-out with working software at every phase
+
+---
+
+## Non-Goals (Initial Versions)
+
+- Full cloud SaaS deployment
+- Real-time collaboration
+- Enterprise auth / RBAC
+- Perfect schema inference or automated data modeling
+
+---
+
+## High-Level Architecture
+
+### Logical Components
+
+1. **Frontend**
+   - Notebook selection
+   - File ingestion (local)
+   - Chat interface
+   - Answer rendering with citations
+   - Optional data preview tabs (tables, transcripts)
+
+2. **Backend API**
+   - FastAPI-based service
+   - Agent loop orchestrator
+   - Tool registry and executors
+   - Ingestion pipelines
+   - Query routing
+
+3. **Agent Layer**
+   - Gemini-powered planner
+   - Tool execution loop (ReAct-style)
+   - Self-correction and retry
+   - Final synthesis with provenance
+
+4. **Storage**
+   - Metadata DB (SQLite or Postgres)
+   - OLAP DB (DuckDB)
+   - Vector store (FAISS / Chroma)
+   - Raw local files
+
+---
+
+## Technology Stack (Recommended)
+
+### Backend
+- Python 3.11+
+- FastAPI
+- Pydantic
+- DuckDB
+- FAISS or Chroma
+- SQLite (metadata)
+- ffmpeg (video/audio)
+- Whisper (local ASR, optional)
+
+### Frontend
+- React + TypeScript
+- Vite
+- Simple component library (MUI / Radix optional)
+
+### AI / ML
+- Gemini Pro (planning, synthesis, text-to-SQL)
+- Gemini Flash (routing, lightweight steps)
+- Gemini Embeddings
+- Gemini Vision (image understanding)
+
+---
+
+## Notebook Abstraction
+
+A **Notebook** is the unit of isolation and context.
+
+Each notebook contains:
+- Raw files
+- Parsed documents
+- OLAP tables
+- Vector index
+- Metadata
+
+Suggested on-disk layout:
+
+data/
+notebooks/
+<notebook_id>/
+raw/
+metadata.db
+analytics.duckdb
+vectors/
+
+---
+
+## Query Capabilities
+
+The system supports:
+
+- “What does this document say about X?”
+- “Compare revenue by region over time”
+- “What was decided in the meeting at 14:30 in the video?”
+- “Show me a chart of customer growth and explain anomalies”
+- Mixed queries spanning **documents + numbers + transcripts**
+
+---
+
+## Agent Design (Conceptual)
+
+The agent executes an explicit loop:
+
+1. Inspect notebook context
+2. Classify query intent:
+   - structured
+   - unstructured
+   - multimodal
+   - mixed
+3. Generate a plan (tool calls)
+4. Execute tools step-by-step
+5. Repair on failure
+6. Synthesize final answer with citations
+
+This loop is observable and debuggable.
+
+---
+
+## Tooling Primitives (Conceptual)
+
+- `GetNotebookContext`
+- `DescribeSchema`
+- `ExecuteSQL`
+- `RAGSearch`
+- `SummarizeChunks`
+- `RunOCR`
+- `TranscribeVideo`
+
+Each tool is deterministic and testable.
+
+---
+
+## Repository Structure (Proposed)
+
+backend/
+app/
+api/
+agent/
+tools/
+ingestion/
+storage/
+schemas/
+main.py
+
+frontend/
+src/
+components/
+pages/
+services/
+
+data/
+scripts/
+PLAN.md
+README.md
+
+---
+
+## Getting Started (Developer)
+
+1. Clone repo
+2. Install backend dependencies
+3. Run backend (`uvicorn`)
+4. Run frontend (`npm run dev`)
+5. Create a notebook
+6. Upload documents
+7. Ask questions
+
+Details are intentionally deferred to implementation phases.
+
+---
+
+## Evaluation Criteria
+
+- Agent plans are multi-step and visible
+- Text-to-SQL works on non-trivial queries
+- RAG answers cite sources correctly
+- Video answers include timestamps
+- System remains usable with large documents
+
+---
+
+## License
+
+MIT (recommended for a side project)
+
+
+⸻
+
+PLAN.md
+
+# Project Plan – Local NotebookLM Clone
+
+This plan is intentionally **incremental**. Every phase results in a usable system.
+
+---
+
+## Phase 0 – Foundations (Week 1)
+
+### Goals
+- Repo scaffolding
+- Working backend + frontend
+- Single notebook abstraction
+- Plain-text RAG
+
+### Deliverables
+- FastAPI app running
+- React UI with:
+  - Notebook creation
+  - File upload
+  - Chat interface
+- Text ingestion (TXT, MD)
+- Chunking + embedding
+- Vector search
+- Answer synthesis
+
+### Key Tasks
+- Backend project structure
+- Metadata DB schema
+- Basic RAG pipeline
+- Minimal Gemini integration
+- Simple prompts
+
+### Exit Criteria
+- User uploads text
+- User asks a question
+- System retrieves chunks and answers
+
+---
+
+## Phase 1 – Unstructured Documents (Week 2)
+
+### Goals
+- PDF and DOCX support
+- Robust chunking
+- Citations
+
+### Deliverables
+- PDF parsing
+- DOCX parsing
+- Chunk metadata:
+  - document_id
+  - page number
+  - section
+- Citation-aware answers
+
+### Key Tasks
+- Document parsers
+- Chunking strategies
+- Embedding pipeline
+- Prompt enforcing citations
+
+### Exit Criteria
+- Answer references specific documents/pages
+
+---
+
+## Phase 2 – Structured Data + Text-to-SQL (Week 3)
+
+### Goals
+- OLAP analytics via DuckDB
+- Natural language queries over tables
+
+### Deliverables
+- CSV/XLS ingestion
+- DuckDB loading
+- Schema introspection
+- Text-to-SQL agent loop
+- SQL repair on error
+
+### Key Tasks
+- Schema inference
+- Column statistics
+- Text-to-SQL prompt design
+- SQL execution + retry logic
+
+### Exit Criteria
+- User asks numerical question
+- System generates SQL
+- SQL executes successfully
+- Result explained in text
+
+---
+
+## Phase 3 – Mixed Queries (Week 4)
+
+### Goals
+- Combine RAG + SQL
+- True agentic routing
+
+### Deliverables
+- Intent classification
+- Multi-step plans
+- Combined synthesis
+
+### Key Tasks
+- Query classifier prompt
+- Plan representation (JSON)
+- Tool orchestration
+- Final synthesis prompt
+
+### Exit Criteria
+- Queries like:
+  “Explain revenue trends using both the financial report and the sales table”
+
+---
+
+## Phase 4 – Images (Week 5)
+
+### Goals
+- Image ingestion and understanding
+
+### Deliverables
+- Image upload
+- OCR extraction
+- Gemini Vision captions
+- Image-aware RAG
+
+### Key Tasks
+- OCR integration
+- Vision prompt design
+- Image chunk indexing
+- UI thumbnails
+
+### Exit Criteria
+- Image content is retrievable and cited
+
+---
+
+## Phase 5 – Video (Week 6)
+
+### Goals
+- Video as a first-class knowledge source
+
+### Deliverables
+- Video ingestion
+- Audio extraction
+- ASR transcripts
+- Timestamped RAG
+
+### Key Tasks
+- ffmpeg integration
+- Whisper or cloud ASR
+- Transcript chunking
+- Timestamp citations
+
+### Exit Criteria
+- Answers link to exact video timestamps
+
+---
+
+## Phase 6 – Agent Hardening (Week 7)
+
+### Goals
+- Make the system feel like an agent, not a pipeline
+
+### Deliverables
+- Explicit ReAct loop
+- Self-check step
+- Tool call logs
+- Debug UI (optional)
+
+### Key Tasks
+- Agent state machine
+- Retry and fallback logic
+- Observability
+
+### Exit Criteria
+- Multi-step reasoning visible
+- Failures handled gracefully
+
+---
+
+## Phase 7 – Polish & Evaluation (Week 8)
+
+### Goals
+- Stability, UX, and clarity
+
+### Deliverables
+- Caching
+- Limits and guardrails
+- Better prompts
+- Documentation
+
+### Key Tasks
+- Performance tuning
+- UX refinements
+- Final README updates
+
+### Exit Criteria
+- Project is demo-ready
+- Clear differentiation from single-shot chatbots
+
+---
+
+## Team Roles (Suggested)
+
+- **Tech Lead / Architect**
+  - Agent design
+  - Prompting strategy
+- **Backend Engineer**
+  - Ingestion pipelines
+  - Storage
+- **Frontend Engineer**
+  - Notebook UX
+  - Chat UI
+- **(Optional) ML Engineer**
+  - Embeddings
+  - RAG quality
+
+---
+
+## Success Definition
+
+This project succeeds if:
+- The agent visibly plans and iterates
+- Structured and unstructured data coexist cleanly
+- Multimodal sources feel natural
+- A technical audience sees it as “real engineering,” not a demo
+
+
